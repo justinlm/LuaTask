@@ -1,6 +1,6 @@
 # LuaTask
 
-A lua task library,  implement with one thead one luaVM, support communication to each other and timer.
+A lua task library,  implement with one thread one luaVM, support communication to each other.
 And use lua coroutine make async event simple.
 
 # Dependencies
@@ -43,7 +43,7 @@ See `Assets/Scripts/LuaMain.cs` `Assets/Resources/Lua/main.lua.txt`
 # Use
 
 1. Put `Assets/Scripts/LuaTask.cs` to your project.
-2. Add Code in your `LuaEnv` init function.
+2. Add Code after your `LuaEnv` inited.
 ```csharp
  luaEnv = new XLua.LuaEnv();
  taskManager = new LuaTask.TaskManager(luaEnv);
