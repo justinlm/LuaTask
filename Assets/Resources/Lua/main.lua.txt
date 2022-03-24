@@ -1,0 +1,59 @@
+-- Tencent is pleased to support the open source community by making xLua available.
+-- Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
+-- Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+-- http://opensource.org/licenses/MIT
+-- Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+local speed = 10
+local lightCpnt = nil
+
+---Step 1. Load task module
+---@type LuaTask
+local luaTask = require("Core.task")
+
+function Start()
+	print("lua start...")
+
+	---Step 2. Create Takes
+	local addr1 = luaTask.new("BattleTask1","battle")
+	local addr2 = luaTask.new("BattleTask2","battle")
+
+	luaTask.async(function()
+		--- Call other luavm's task, and get result.
+		local ret = luaTask.call("lua", addr1, "ADD", 1,2,3,4,5,6,7)
+		luaTask.print("LUA_TASK", ret)
+		--- handle error
+		local res, err = luaTask.call("lua", addr2, "ADD2", 11,22,13,14,15,16,17)
+		if res then
+			luaTask.print("LUA_TASK", res)
+		else
+			luaTask.error("LUA_TASK", err)
+		end
+
+		while true do
+			--- how to use time
+			luaTask.sleep(1000)
+			luaTask.print("Timer Tick")
+		end
+	end)
+end
+
+function Update()
+	---Step 3. call lua task's update
+	luaTask.update()
+end
+
+function OnDestroy()
+    print("lua destroy")
+end
+
+local command = {}
+command.Hello = function(...)
+	luaTask.print(...)
+end
+
+---Receive child task's message
+luaTask.dispatch('lua',function(sender, session, cmd, ...)
+    local fn = command[cmd]
+    luaTask.response("lua", sender, session, fn(...))
+end)
